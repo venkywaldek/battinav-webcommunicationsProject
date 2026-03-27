@@ -4,7 +4,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return { "msg": "Hello local docker!", "v": "0.1" }
+    return { "msg": "Hello Venkat ,local docker!", "v": "0.1" }
 
 
 @app.get("/hello")
