@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+
 
 app = FastAPI()
 
@@ -12,5 +13,5 @@ def hello():
     return {"msh": "Hello venkat"}
 
 @app.get("/api/ip")
-def ip():
-    return{"ip" : "Hello ip"}
+def ip(request: Request):
+    return{"ip" : request.client.host}
