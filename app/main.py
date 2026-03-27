@@ -10,3 +10,7 @@ def read_root():
 @app.get("/hello")
 def hello():
     return {"msh": "Hello venkat"}
+
+@app.get("/api/ip")
+def ip():
+    return{"ip" : "Hello ip"}
