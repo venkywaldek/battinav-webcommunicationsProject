@@ -1,22 +1,24 @@
-@apiUrl =  https://fw-teaching.fi/demo/wdbocms/api/v1/products/
+@apiUrl =  http://localhost:8080/items/rum/
 
 
-###Get all products
+###Get all rooms
 
 GET {{apiUrl}}
 
 ###Get one product
 
-GET {{apiUrl}}/1001
+GET {{apiUrl}}
 
 ### Create new product
 POST {{apiUrl}}
 Content-Type: application/json
 
 {
-  "name" : "Jeans",
-  "price" : 49
+  "number" : 4,
+  "persons" : 4,
+  "name" : "Deluxe room"
 }
+
 
 ### Update Product info
 ##Uppdatera hela dataobjekt
