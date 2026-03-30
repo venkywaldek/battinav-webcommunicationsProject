@@ -3,3 +3,17 @@ API _ application programming interface
 
 vår första FastAPI app är ett simplet exempel på en webbtjänst api som kan leverera innehåll åt en webbapp 
 
+SOAP : simple object access protocol
+ursprungligen skapat som XML-rpc
+här ni en webbservice 
+
+REST funkar så att vi berättar vad vill ha . om vi vill ha , olika , vi ska massa om olika end pointer, men i GrapHQL , här bara en end point med en query , json format, så förväg behöver inte skapa i en coda massa om url
+
+gRPC : googles egna CNCF , baserat på HTTP/2 använder Protobuf och binär kommunikation. mycket snabbt och effektivt med stöd for streaming men inte människoläsbart.
+Ökar i användning , särskilt inom moln och mikrotjäsnter.
+
+Websocket: uppgraders sins http request , till webbsocket connection , om man vil skapa en chatt,  och i en webbbaserad chat
+
+MQTT : Message Queuing telemetry Transport
+skapat av IBM & arcom , standiserat av OASIS & ISO/IEC
+
