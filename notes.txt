@@ -1,0 +1,5 @@
+oilka programmvara frontend och  
+API _ application programming interface
+
+vår första FastAPI app är ett simplet exempel på en webbtjänst api som kan leverera innehåll åt en webbapp 
+
