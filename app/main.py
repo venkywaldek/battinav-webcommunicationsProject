@@ -32,6 +32,9 @@ def read_root():
 def rooms():
     return  temp_rooms
 
+@app.put("/rooms")
+def rooms():
+    return  temp_rooms
 
 @app.post("/bookings")
 def create_booking():
