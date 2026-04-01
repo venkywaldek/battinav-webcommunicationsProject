@@ -1,5 +1,4 @@
-@apiUrl =  http://localhost:8080/items/rum/
-
+@apiUrl =  http://localhost:8080
 
 ###Get all rooms
 
@@ -10,24 +9,24 @@ GET {{apiUrl}}
 GET {{apiUrl}}
 
 ### Create new product
-POST {{apiUrl}}
+POST {{apiUrl}}/bookings
 Content-Type: application/json
 
 {
-  "number" : 4,
-  "persons" : 4,
-  "name" : "Deluxe room"
+  "room_number" : 404,
+  "price" : 300,
+  "room_type" : "Deluxe room"
 }
 
 
 ### Update Product info
 ##Uppdatera hela dataobjekt
-PUT {{apiUrl}}/1001
+PUT {{apiUrl}}/rooms
 Content-Type: application/json
 
 {
-  "name" : "Shirt",
-  "price" : 29
+  "room_number" :404,
+  "price" : 350
 }
 
 

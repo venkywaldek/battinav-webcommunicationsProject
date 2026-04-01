@@ -16,26 +16,24 @@ app.add_middleware(
 # def read_root():
 #     return { "msg": "Hello Venkat ,local docker!", "v": "0.1" }
 
+#tillfälligt data
 
-@app.get("/hello")
-def hello():
-    return {"msg": "Hello venkat"}
-
-
-
-rooms = [ {"number" : 1, "persons" : 1  , "name" : "singleroom"}, {"number" : 2, "persons" : 2  , "name" : "doubleroom"},  {"number" : 3, "persons" : 3  , "name" : "Suiteroom"}]
+temp_rooms = [ 
+         {"room_number" : 101, "price" : 1  , "room_type" : "double room"}, 
+         {"room_number" : 202, "price" : 2  , "room_type" : "single room"}, 
+         {"room_number" : 303, "price" : 3  , "room_type" : "Suite"}
+    ]
  
-@app.get("/items/rooms")
+@app.get("/")
 def read_root():
-    return rooms
+    return("Välkommen till hötell  API")
 
-@app.get("/hotel")
-
-def hotel():
-    return {"msg": "Hello Hotel"}
-
+@app.get("/rooms")
+def rooms():
+    return  temp_rooms
 
 
-@app.get("/api/ip")
-def ip(request: Request):
-    return{"ip" : request.client.host}
+@app.post("/bookings")
+def create_booking():
+    return{"msg" : "booking skapad"}
+
