@@ -16,8 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-create_schema()
-
 class Booking(BaseModel):
     guest_id: int
     room_id: int
@@ -107,3 +105,50 @@ def create_booking(booking: Booking):
 @app.on_event("startup")
 def startup():
     create_schema()
+
+
+@app.get("/bookings")
+def get_bookings():
+ with get_conn() as conn, conn.cursor() as cur:
+    cur.execute("""
+        SELECT
+            hb.id,
+            hg.first_name,
+            hg.last_name,
+            hr.room_number,
+            hb.datefrom,
+            hb.dateto,
+            (hb.dateto::date - hb.datefrom::date) AS nights,
+            hr.price,
+            (hb.dateto::date - hb.datefrom::date) * hr.price AS total_price,
+            hb.addinfo
+        FROM hotel_bookings hb
+        INNER JOIN hotel_guests hg
+            ON hb.guest_id = hg.id
+        INNER JOIN hotel_rooms hr
+            ON hb.room_id = hr.id
+        ORDER BY hb.id
+    """)
+    rows = cur.fetchall()
+    return rows
+
+@app.get("/guests")
+def get_guests():
+ with get_conn() as conn, conn.cursor() as cur:
+    cur.execute("""
+        SELECT
+            hg.id,
+            hg.first_name,
+            hg.last_name,
+            hg.address,
+            (
+                SELECT COUNT(*)
+                FROM hotel_bookings hb
+                WHERE hb.guest_id = hg.id
+                  AND hb.dateto::date < CURRENT_DATE
+            ) AS previous_visits
+        FROM hotel_guests hg
+        ORDER BY hg.id
+    """)
+    rows = cur.fetchall()
+    return rows

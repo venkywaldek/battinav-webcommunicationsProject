@@ -1,4 +1,3 @@
-# Local dev environment with postgresql
 services:
   postgres:
     image: postgres:17
@@ -11,7 +10,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      ##DATABASE_URL=postgresql://devuser:devpassword@postgres:5432/devdb
 
   fastapi-app:
     build:
@@ -19,15 +17,13 @@ services:
     depends_on:
       - postgres
     volumes:
-      # Mount the local app directory to the /code/app directory in the container    
       - ./app:/code/app
     ports:
       - "8080:8080"
     environment:
-      - PYTHONUNBUFFERED=1
-      - MODE
-      - DATABASE_URL
-      
+      PYTHONUNBUFFERED: "1"
+      MODE: development
+      DATABASE_URL: postgresql://devuser:devpassword@postgres:5432/devdb
 
 volumes:
   postgres_data:

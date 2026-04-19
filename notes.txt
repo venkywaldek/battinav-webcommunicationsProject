@@ -17,3 +17,8 @@ Websocket: uppgraders sins http request , till webbsocket connection , om man vi
 MQTT : Message Queuing telemetry Transport
 skapat av IBM & arcom , standiserat av OASIS & ISO/IEC
 
+
+
+subqueries : av  olika  orsaler man iblaknd s.k subqueries i stället för joins
+
+

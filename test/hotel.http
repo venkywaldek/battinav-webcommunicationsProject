@@ -6,7 +6,9 @@ GET {{apiUrl}}
 
 ###Get one product
 
-GET {{apiUrl}}
+
+
+GET {{apiUrl}}/bookings
 
 ### Create new product
 POST {{apiUrl}}/bookings
