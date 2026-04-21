@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: postgres:14.20-trixie
+          env:
+            - name: POSTGRES_DB
+              value: devdb
+            - name: POSTGRES_USER
+              value: devuser
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql
+                  key: database-password
+            - name: PGDATA
+              value: /var/lib/postgresql/pgdata
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: psql
+              mountPath: /var/lib/postgresql/data
+
+        - name: pgweb
+          image: sosedoff/pgweb:latest
+          args:
+            - '--bind=0.0.0.0'
+            - '--listen=8081'
+          ports:
+            - containerPort: 8081
+              name: http
+
+      volumes:
+        - name: psql
+          persistentVolumeClaim:
+            claimName: psql

@@ -1,9 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.security import APIKeyHeader
 from datetime import date
 from typing import Optional
 from app.db import get_conn, create_schema
+
 
 app = FastAPI()
 
@@ -23,6 +25,31 @@ class Booking(BaseModel):
     dateto: date
     addinfo: Optional[str] = None
 
+class BookingStars(BaseModel):
+    stars:int
+
+@app.on_event("startup")
+def startup():
+    create_schema()
+
+api_key_header = APIKeyHeader( name = "X-API-Key", auto_error = False )
+
+def validate_api_key(api_key: str = Depends(api_key_header)):
+    if not api_key:
+        raise HTTPException(status_code=401, detail={"error": "API key missing"})
+
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            SELECT * FROM hotel_guests WHERE api_key = %s
+        """, [api_key])
+        guest = cur.fetchone()
+
+    if not guest:
+        raise HTTPException(status_code=401, detail={"error": "Guest missing"})
+
+    return guest   
+
+#main route for this api
 @app.get("/")
 def root():
     with get_conn() as conn, conn.cursor() as cur:
@@ -54,27 +81,27 @@ def get_room(id: int):
         room = cur.fetchall()
     return room
 
-@app.get("/bookings")
-def get_bookings():
-    with get_conn() as conn, conn.cursor() as cur:
-        cur.execute("""
-            SELECT
-                hb.id,
-                hb.guest_id,
-                hb.room_id,
-                hb.datefrom,
-                hb.dateto,
-                hb.addinfo,
-                hr.room_number
-            FROM hotel_bookings hb
-            JOIN hotel_rooms hr ON hb.room_id = hr.id
-            ORDER BY hb.datefrom, hb.dateto
-        """)
-        bookings = cur.fetchall()
-    return bookings
+# @app.get("/bookings")
+# def get_bookings():
+#     with get_conn() as conn, conn.cursor() as cur:
+#         cur.execute("""
+#             SELECT
+#                 hb.id,
+#                 hb.guest_id,
+#                 hb.room_id,
+#                 hb.datefrom,
+#                 hb.dateto,
+#                 hb.addinfo,
+#                 hr.room_number
+#             FROM hotel_bookings hb
+#             JOIN hotel_rooms hr ON hb.room_id = hr.id
+#             ORDER BY hb.datefrom, hb.dateto
+#         """)
+#         bookings = cur.fetchall()
+#     return bookings
 
 @app.post("/bookings")
-def create_booking(booking: Booking):
+def create_booking(booking: Booking, guest:dict = Depends(validate_api_key)):
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute("""
             INSERT INTO hotel_bookings (
@@ -102,13 +129,11 @@ def create_booking(booking: Booking):
 
     return {"msg": "booking created", "booking": new_booking}
 
-@app.on_event("startup")
-def startup():
-    create_schema()
 
-
+#list all bookings
 @app.get("/bookings")
-def get_bookings():
+def get_bookings(guest: dict = Depends(validate_api_key)):
+ print(guest)
  with get_conn() as conn, conn.cursor() as cur:
     cur.execute("""
         SELECT
@@ -121,19 +146,41 @@ def get_bookings():
             (hb.dateto::date - hb.datefrom::date) AS nights,
             hr.price,
             (hb.dateto::date - hb.datefrom::date) * hr.price AS total_price,
-            hb.addinfo
+            hb.addinfo,
+            hb.stars
         FROM hotel_bookings hb
         INNER JOIN hotel_guests hg
             ON hb.guest_id = hg.id
         INNER JOIN hotel_rooms hr
             ON hb.room_id = hr.id
-        ORDER BY hb.id
+        ORDER BY hb.id DESC
+        LIMIT 5
     """)
     rows = cur.fetchall()
     return rows
 
+@app.put("/bookings/{id}")
+def update_booking_stars(id:int, review: BookingStars, guest: dict = Depends(validate_api_key)):
+    if review.stars < 1 or review.stars > 5:
+        raise HTTPException(status_code=400, detail="Stars must be between 1 and 5")
+    
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute(""" 
+                    UPDATE hotel_bookings
+                    SET stars = %s
+                    WHERE id = %s
+                    RETURNING *
+                    """,(review.stars, id))
+        update_booking = cur.fetchone()
+                    
+    if not update_booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    return{"msg": "review saved", "booking": update_booking}
+    
+        
+# List all guests
 @app.get("/guests")
-def get_guests():
+def get_guests(guest: dict = Depends(validate_api_key)):
  with get_conn() as conn, conn.cursor() as cur:
     cur.execute("""
         SELECT
@@ -152,3 +199,11 @@ def get_guests():
     """)
     rows = cur.fetchall()
     return rows
+
+@app.get("/current_guest")
+def get_current_guest(guest: dict = Depends(validate_api_key)):
+    return {
+        "id": guest["id"],
+        "first_name": guest["first_name"],
+        "last_name": guest["last_name"]
+    }
