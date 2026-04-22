@@ -76,5 +76,6 @@ def create_schema():
                 SELECT 1
                 FROM hotel_rooms
                 WHERE room_number = 101
-            );
-        """)
+             );
+           """)
+            

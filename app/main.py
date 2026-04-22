@@ -5,11 +5,13 @@ from fastapi.security import APIKeyHeader
 from datetime import date
 from typing import Optional
 from app.db import get_conn, create_schema
+from makupsafe import escape
 
 
 app = FastAPI()
 
 origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -104,7 +106,7 @@ def create_booking(booking: Booking, guest:dict = Depends(validate_api_key)):
             booking.room_id,
             booking.datefrom,
             booking.dateto,
-            booking.addinfo
+           escape(booking.addinfo)
         ))
         new_booking = cur.fetchone()
 
