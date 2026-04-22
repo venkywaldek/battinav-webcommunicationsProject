@@ -1,4 +1,5 @@
 @apiUrl =  http://localhost:8080
+@api_key = {{$dotenv API_KEY}}
 
 ###Get all rooms
 
@@ -18,12 +19,14 @@ Content-Type: application/json
   "room_id" : 1,
   "guest_id" : 1,
   "datefrom": "2026-05-01",
-  "dateto" :"2026-05-10"
+  "dateto" :"2026-05-10",
+  "info" : "rena lakan den här gången"
 }
 
 
 ### Update Product info
 ##Uppdatera hela dataobjekt
+
 PUT {{apiUrl}}/rooms
 Content-Type: application/json
 

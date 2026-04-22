@@ -177,7 +177,7 @@ def update_booking_stars(id:int, review: BookingStars, guest: dict = Depends(val
         raise HTTPException(status_code=404, detail="Booking not found")
     return{"msg": "review saved", "booking": update_booking}
     
-        
+
 # List all guests
 @app.get("/guests")
 def get_guests(guest: dict = Depends(validate_api_key)):
@@ -207,3 +207,12 @@ def get_current_guest(guest: dict = Depends(validate_api_key)):
         "first_name": guest["first_name"],
         "last_name": guest["last_name"]
     }
+
+@app.get("/debug/guests")
+def debug_guests():
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute("""
+            SELECT id, first_name, last_name, api_key
+            FROM hotel_guests
+        """)
+        return cur.fetchall()
