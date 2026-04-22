@@ -81,25 +81,6 @@ def get_room(id: int):
         room = cur.fetchall()
     return room
 
-# @app.get("/bookings")
-# def get_bookings():
-#     with get_conn() as conn, conn.cursor() as cur:
-#         cur.execute("""
-#             SELECT
-#                 hb.id,
-#                 hb.guest_id,
-#                 hb.room_id,
-#                 hb.datefrom,
-#                 hb.dateto,
-#                 hb.addinfo,
-#                 hr.room_number
-#             FROM hotel_bookings hb
-#             JOIN hotel_rooms hr ON hb.room_id = hr.id
-#             ORDER BY hb.datefrom, hb.dateto
-#         """)
-#         bookings = cur.fetchall()
-#     return bookings
-
 @app.post("/bookings")
 def create_booking(booking: Booking, guest:dict = Depends(validate_api_key)):
     with get_conn() as conn, conn.cursor() as cur:
@@ -169,8 +150,9 @@ def update_booking_stars(id:int, review: BookingStars, guest: dict = Depends(val
                     UPDATE hotel_bookings
                     SET stars = %s
                     WHERE id = %s
+                    AND guest_id = %s
                     RETURNING *
-                    """,(review.stars, id))
+                    """,(review.stars, id, guest['id']))
         update_booking = cur.fetchone()
                     
     if not update_booking:

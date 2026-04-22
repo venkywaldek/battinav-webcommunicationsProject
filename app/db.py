@@ -60,3 +60,21 @@ def create_schema():
                   ADD COLUMN IF NOT EXISTS stars INT;
                  
             """)
+            cur.execute("""
+               INSERT INTO hotel_guests (first_name, last_name, address)
+               SELECT 'Pelle', 'Svanslös', 'Testgatan 1'
+                WHERE NOT EXISTS (
+               SELECT 1
+               FROM hotel_guests
+             WHERE first_name = 'Pelle' AND last_name = 'Svanslös'
+                );
+             """)
+            cur.execute("""
+            INSERT INTO hotel_rooms (room_number, room_type, price)
+            SELECT 101, 'Single', 120
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM hotel_rooms
+                WHERE room_number = 101
+            );
+        """)
