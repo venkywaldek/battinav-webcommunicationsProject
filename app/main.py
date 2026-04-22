@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, coint
 from fastapi.security import APIKeyHeader
 from datetime import date
 from typing import Optional
@@ -26,7 +26,7 @@ class Booking(BaseModel):
     addinfo: Optional[str] = None
 
 class BookingStars(BaseModel):
-    stars:int
+    stars:coint(ge=1, le=5) #tar emoit 1 till 5
 
 @app.on_event("startup")
 def startup():
