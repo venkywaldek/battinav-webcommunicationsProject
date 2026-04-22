@@ -1,17 +1,15 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, coint
+from pydantic import BaseModel
 from fastapi.security import APIKeyHeader
 from datetime import date
 from typing import Optional
 from app.db import get_conn, create_schema
-from makupsafe import escape
 
 
 app = FastAPI()
 
 origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -28,7 +26,7 @@ class Booking(BaseModel):
     addinfo: Optional[str] = None
 
 class BookingStars(BaseModel):
-    stars:coint(ge=1, le=5) #tar emoit 1 till 5
+    stars:int
 
 @app.on_event("startup")
 def startup():
@@ -106,7 +104,7 @@ def create_booking(booking: Booking, guest:dict = Depends(validate_api_key)):
             booking.room_id,
             booking.datefrom,
             booking.dateto,
-           escape(booking.addinfo)
+            booking.addinfo
         ))
         new_booking = cur.fetchone()
 
